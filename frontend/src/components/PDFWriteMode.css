@@ -1,0 +1,284 @@
+
+.pdfwm-root {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 10000;
+  font-family: Inter, "Segoe UI", Arial, sans-serif;
+  color: #393449;
+}
+
+.pdfwm-launcher {
+  border: 0;
+  border-radius: 999px;
+  padding: 13px 18px;
+  color: white;
+  background: linear-gradient(110deg, #8d67b7, #d889b1);
+  box-shadow: 0 8px 28px #62447b40;
+  font-size: 13px;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.pdfwm-panel {
+  position: absolute;
+  right: 0;
+  bottom: 58px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: min(760px, calc(100vw - 32px));
+  max-height: min(84vh, 900px);
+  padding: 16px;
+  overflow: auto;
+  border: 1px solid #e7d9f0;
+  border-radius: 18px;
+  background: #fffafd;
+  box-shadow: 0 18px 60px #34234435;
+}
+
+.pdfwm-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.pdfwm-header h2 {
+  margin: 2px 0 5px;
+  color: #69498a;
+  font-size: 20px;
+}
+
+.pdfwm-header p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.pdfwm-eyebrow {
+  color: #a16eaa;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.pdfwm-close {
+  border: 0;
+  border-radius: 8px;
+  padding: 5px 10px;
+  background: #f2eafb;
+  color: #684b83;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.pdfwm-toolbar {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.pdfwm-toolbar button,
+.pdfwm-pages button,
+.pdfwm-placement button,
+.pdfwm-actions button {
+  border: 1px solid #e4d5ed;
+  border-radius: 9px;
+  padding: 9px 11px;
+  background: #f4ecfa;
+  color: #654783;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pdfwm-toolbar label {
+  display: grid;
+  gap: 5px;
+  color: #786886;
+  font-size: 11px;
+}
+
+.pdfwm-toolbar select {
+  min-width: 170px;
+  padding: 9px;
+  border: 1px solid #e4d5ed;
+  border-radius: 9px;
+  background: white;
+  color: #393449;
+  font: inherit;
+}
+
+.pdfwm-zoom-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #786886;
+  font-size: 11px;
+}
+
+.pdfwm-zoom-controls button {
+  min-width: 34px;
+  padding: 7px 9px;
+}
+
+.pdfwm-pages {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 11px;
+}
+
+.pdfwm-pages > span {
+  max-width: 48%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pdfwm-pages > div {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.pdfwm-pages button {
+  padding: 6px 8px;
+}
+
+.pdfwm-preview {
+  min-height: 130px;
+  max-height: 50vh;
+  overflow: auto;
+  border: 1px solid #e6dbea;
+  border-radius: 10px;
+  background: #f3eff6;
+}
+
+.pdfwm-canvas-stack {
+  position: relative;
+  width: max-content;
+  max-width: 100%;
+  margin: 0 auto;
+  line-height: 0;
+}
+
+.pdfwm-page-canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  background: white;
+}
+
+.pdfwm-annotation-canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.pdfwm-empty {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 30px 18px;
+  color: #786886;
+  text-align: center;
+}
+
+.pdfwm-empty > span {
+  color: #a17bc8;
+  font-size: 36px;
+}
+
+.pdfwm-empty p {
+  max-width: 360px;
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.pdfwm-placement {
+  display: grid;
+  gap: 8px;
+  color: #786886;
+  font-size: 12px;
+}
+
+.pdfwm-placement input {
+  width: 100%;
+  accent-color: #9b75bf;
+}
+
+.pdfwm-placement button {
+  justify-self: start;
+}
+
+.pdfwm-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pdfwm-actions .pdfwm-primary {
+  border-color: transparent;
+  background: linear-gradient(110deg, #9a74bf, #d98db2);
+  color: white;
+}
+
+.pdfwm-actions button:disabled,
+.pdfwm-toolbar button:disabled,
+.pdfwm-pages button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.pdfwm-status {
+  min-height: 18px;
+  margin: 0;
+  color: #684b83;
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.pdfwm-note {
+  margin: 0;
+  color: #897d93;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+@media (max-width: 560px) {
+  .pdfwm-root {
+    right: 10px;
+    bottom: 10px;
+  }
+
+  .pdfwm-panel {
+    right: -2px;
+    width: calc(100vw - 20px);
+    padding: 12px;
+  }
+
+  .pdfwm-launcher {
+    padding: 11px 13px;
+    font-size: 11px;
+  }
+
+  .pdfwm-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .pdfwm-actions button {
+    width: 100%;
+  }
+}

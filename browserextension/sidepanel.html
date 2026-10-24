@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#fff9fc">
+  <title>MathMate — AI Study Companion</title>
+
+  <link rel="stylesheet" href="./lib/katex/katex.min.css">
+
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #fff9fc;
+      --ink: #403344;
+      --muted: #9a899c;
+      --line: #f0e4ed;
+      --pink: #d98bbd;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+    }
+
+    body {
+      min-height: 420px;
+      color: var(--ink);
+      background:
+        radial-gradient(ellipse at 18% 0%, #fce7f3, transparent 36%),
+        radial-gradient(ellipse at 100% 20%, #f0e9ff, transparent 38%),
+        var(--bg);
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+      font-size: 14px;
+    }
+
+    button, textarea { font: inherit; }
+    button { cursor: pointer; }
+    button:disabled { opacity: .55; cursor: wait; }
+
+    button:focus-visible,
+    textarea:focus-visible {
+      outline: 2px solid #bd8ac7;
+      outline-offset: 2px;
+    }
+
+    .app {
+      width: 100%;
+      height: 100%;
+      min-height: 420px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 15px 16px;
+      border-bottom: 1px solid var(--line);
+      background: #fffafd;
+      flex-shrink: 0;
+    }
+
+    .brand { display: flex; align-items: center; gap: 10px; }
+
+    .logo {
+      display: grid;
+      place-items: center;
+      width: 36px;
+      height: 36px;
+      flex-shrink: 0;
+      border-radius: 50%;
+      color: #a34e91;
+      background: linear-gradient(140deg, #f9d9ec, #e4dcff);
+      font-size: 22px;
+    }
+
+    .brand-name { font-size: 17px; font-weight: 700; }
+    .brand-subtitle { margin-top: 3px; color: var(--muted); font-size: 10px; }
+
+    .icon-button {
+      width: 36px;
+      height: 36px;
+      flex-shrink: 0;
+      border: 0;
+      border-radius: 50%;
+      background: transparent;
+      color: #8b748e;
+      font-size: 19px;
+    }
+
+    .icon-button:hover, .composer-tool:hover { background: #f9eaf5; }
+
+    .source-tools {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 10px 12px 0;
+      flex-shrink: 0;
+    }
+
+    .source-button {
+      padding: 8px 11px;
+      border: 1px solid #ecdce9;
+      border-radius: 999px;
+      background: #fff;
+      color: #8f6487;
+      font-size: 11px;
+    }
+
+    .source-button:hover { background: #f9eaf5; }
+    #pdfFile { display: none; }
+
+    .source-status {
+      min-height: 27px;
+      padding: 7px 15px 3px;
+      color: var(--muted);
+      font-size: 10px;
+      text-align: center;
+      overflow-wrap: anywhere;
+      flex-shrink: 0;
+    }
+
+    .source-status.error { color: #b42357; }
+
+    .main {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      padding: 12px 15px;
+      overscroll-behavior: contain;
+    }
+
+    .greeting {
+      margin: auto 0 0;
+      padding: 25px 0 20px;
+      text-align: center;
+    }
+
+    .sparkle { margin-bottom: 12px; font-size: 32px; color: #ba83c6; }
+
+    .greeting h1 {
+      margin: 0;
+      font-size: 27px;
+      line-height: 1.3;
+      font-weight: 500;
+      letter-spacing: -.8px;
+    }
+
+    .greeting h1 span {
+      background: linear-gradient(100deg, #cf76a9, #9c82d7);
+      color: transparent;
+      background-clip: text;
+      -webkit-background-clip: text;
+    }
+
+    .greeting p { color: var(--muted); font-size: 12px; }
+
+    .suggestions {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 7px;
+      padding: 18px 0 12px;
+      margin-top: auto;
+    }
+
+    .suggestion {
+      width: fit-content;
+      max-width: 100%;
+      padding: 9px 12px;
+      text-align: left;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: #79647b;
+      background: #fffdfd;
+      font-size: 11px;
+    }
+
+    .suggestion:hover { background: #f9eaf5; }
+
+    .chat {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding-bottom: 10px;
+      min-width: 0;
+    }
+
+    .message {
+      max-width: 95%;
+      padding: 12px 14px;
+      border-radius: 18px;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      line-height: 1.65;
+      font-size: 13px;
+    }
+
+    .message.user {
+      align-self: flex-end;
+      background: linear-gradient(130deg, #f9e3f1, #eee6ff);
+      border: 1px solid #f0d9ea;
+      border-bottom-right-radius: 5px;
+    }
+
+    .message.assistant {
+      align-self: flex-start;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-bottom-left-radius: 5px;
+    }
+
+    .message-label {
+      display: block;
+      margin-bottom: 5px;
+      color: #ac6d9c;
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .message-body { min-width: 0; }
+    .message-body .katex-display { overflow-x: auto; overflow-y: hidden; }
+
+    .composer-area {
+      padding: 8px 13px 12px;
+      background: #fff9fc;
+      flex-shrink: 0;
+    }
+
+    .composer {
+      padding: 11px 12px 10px;
+      border: 1px solid #e9d8e7;
+      border-radius: 25px;
+      background: #fffefe;
+      box-shadow: 0 4px 18px #d7b3d010;
+    }
+
+    #question {
+      display: block;
+      width: 100%;
+      min-height: 44px;
+      max-height: 130px;
+      resize: vertical;
+      padding: 4px 3px 9px;
+      border: 0;
+      outline: none;
+      background: transparent;
+      color: var(--ink);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    #question::placeholder { color: #ae9eaf; }
+
+    .composer-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .composer-tools {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px;
+      min-width: 0;
+    }
+
+    .composer-tool {
+      width: 31px;
+      height: 31px;
+      flex-shrink: 0;
+      border: 0;
+      border-radius: 50%;
+      color: #9c75a0;
+      background: transparent;
+      font-size: 19px;
+    }
+
+    .context-pill {
+      max-width: 125px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: #9b7397;
+      font-size: 10px;
+    }
+
+    .send-button {
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      width: 35px;
+      height: 35px;
+      border: 0;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #e6b5d7, #c4b0ed);
+      color: #563d60;
+      font-size: 20px;
+    }
+
+    .send-button:hover { filter: brightness(.97); }
+
+    .footer-note {
+      padding-top: 7px;
+      color: #b09eaf;
+      font-size: 9px;
+      text-align: center;
+    }
+
+    [hidden] { display: none !important; }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">✧</div>
+        <div>
+          <div class="brand-name">MathMate</div>
+          <div class="brand-subtitle">Your AI study companion</div>
+        </div>
+      </div>
+
+      <button
+        id="newChat"
+        class="icon-button"
+        type="button"
+        title="New chat"
+        aria-label="New chat"
+      >✎</button>
+    </header>
+
+    <div class="source-tools">
+      <button id="readScreen" class="source-button" type="button">
+        ◉ Read screen
+      </button>
+
+      <button id="choosePdf" class="source-button" type="button">
+        ＋ Add PDF
+      </button>
+
+      <input
+        id="pdfFile"
+        type="file"
+        accept=".pdf,application/pdf"
+        aria-label="Select a PDF file"
+      >
+    </div>
+
+    <div
+      id="sourceStatus"
+      class="source-status"
+      role="status"
+      aria-live="polite"
+    >Ready when you are</div>
+
+    <main id="main" class="main">
+      <section id="greetingArea" class="greeting">
+        <div class="sparkle" aria-hidden="true">✦</div>
+        <h1>Ready when <span>you are</span></h1>
+        <p>What shall we learn together today?</p>
+      </section>
+
+      <section id="suggestions" class="suggestions" aria-label="Suggested questions">
+        <button class="suggestion" type="button" data-prompt="Explain this concept in simple words.">
+          Explain this concept simply
+        </button>
+        <button class="suggestion" type="button" data-prompt="Help me solve this problem step by step.">
+          Solve a problem step by step
+        </button>
+        <button class="suggestion" type="button" data-prompt="Make concise revision notes from this material.">
+          Make revision notes
+        </button>
+      </section>
+
+      <section
+        id="chat"
+        class="chat"
+        aria-label="Conversation"
+        aria-live="polite"
+        aria-relevant="additions"
+      ></section>
+
+    </main>
+
+    <footer class="composer-area">
+      <div class="composer">
+        <textarea
+          id="question"
+          rows="2"
+          placeholder="Ask MathMate anything..."
+          aria-label="Ask MathMate anything"
+        ></textarea>
+
+        <div class="composer-bottom">
+          <div class="composer-tools">
+            <button
+              id="attachPdf"
+              class="composer-tool"
+              type="button"
+              title="Add PDF"
+              aria-label="Add PDF"
+            >＋</button>
+
+            <button
+              id="voiceInput"
+              class="composer-tool"
+              type="button"
+              title="Voice input"
+              aria-label="Voice input"
+            >🎙</button>
+
+            <button id="pauseVoiceReply" class="composer-tool" type="button" title="Pause spoken answer" aria-label="Pause spoken answer" hidden>⏸</button>
+            <button id="stopVoiceReply" class="composer-tool" type="button" title="Stop spoken answer" aria-label="Stop spoken answer" hidden>■</button>
+
+            <div
+              id="contextPill"
+              class="context-pill"
+              title="Current study source"
+            >No source selected</div>
+          </div>
+
+          <button
+            id="askButton"
+            class="send-button"
+            type="button"
+            title="Send message"
+            aria-label="Send message"
+          >↑</button>
+        </div>
+      </div>
+
+      <div class="footer-note">
+        MathMate can make mistakes. Check important answers.
+      </div>
+    </footer>
+  </div>
+
+  <script src="./lib/katex/katex.min.js"></script>
+  <script type="module" src="./sidepanel.js"></script>
+</body>
+</html>

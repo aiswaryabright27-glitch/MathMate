@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Enable MathMate microphone</title>
+    <style>
+      :root { color-scheme: light; font-family: Inter, system-ui, sans-serif; }
+      body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #f5f3ff; color: #29243b; }
+      main { width: min(440px, calc(100vw - 40px)); padding: 32px; border: 1px solid #e4defa; border-radius: 20px; background: white; box-shadow: 0 18px 60px #39217a18; }
+      h1 { margin: 0 0 12px; font-size: 24px; }
+      p { color: #686278; line-height: 1.55; }
+      button { border: 0; border-radius: 12px; padding: 12px 18px; background: #7047eb; color: white; font: inherit; font-weight: 700; cursor: pointer; }
+      button:disabled { opacity: .65; cursor: wait; }
+      #status { min-height: 48px; margin-top: 18px; }
+      #status.error { color: #b42318; }
+      .note { font-size: 13px; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Enable MathMate microphone</h1>
+      <p>Chrome may block microphone prompts inside extension side panels. Use this page to grant MathMate access, then return to the side panel.</p>
+      <button id="enableMicrophone" type="button">Enable microphone</button>
+      <p id="status" role="status" aria-live="polite">Your microphone will only be accessed after you click the button.</p>
+      <p class="note">If Chrome shows a permission prompt, choose Allow. You can close this tab afterward.</p>
+      <script src="mic-permission.js"></script>
+    </main>
+  </body>
+</html>

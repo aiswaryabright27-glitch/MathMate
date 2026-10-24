@@ -1,0 +1,130 @@
+.screen-capture-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin: 0 0 18px;
+  padding: 18px 20px;
+  border: 1px solid #eadcf4;
+  border-radius: 20px;
+  background: linear-gradient(120deg, #fff8fc 0%, #f8f4ff 100%);
+  color: #493b53;
+  box-shadow: 0 8px 24px rgba(119, 83, 139, 0.06);
+}
+
+.dark-mode .screen-capture-card {
+  border-color: #493b55;
+  background: linear-gradient(120deg, #2b2330 0%, #292637 100%);
+  color: #f5edf9;
+}
+
+.screen-capture-copy {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-width: 0;
+}
+
+.screen-capture-icon {
+  display: grid;
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border-radius: 14px;
+  background: #f0e3fa;
+  color: #8c68aa;
+  font-size: 25px;
+}
+
+.dark-mode .screen-capture-icon {
+  background: #44354f;
+  color: #e0c5f6;
+}
+
+.screen-capture-copy h3 {
+  margin: 0 0 5px;
+  font-size: 15px;
+  font-weight: 750;
+}
+
+.screen-capture-copy p {
+  margin: 0;
+  max-width: 560px;
+  font-size: 13px;
+  line-height: 1.55;
+  opacity: 0.78;
+}
+
+.screen-capture-button {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 44px;
+  padding: 0 17px;
+  border: 0;
+  border-radius: 13px;
+  background: #9c79bb;
+  color: #fff;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 750;
+  cursor: pointer;
+  transition: transform 150ms ease, background 150ms ease;
+}
+
+.screen-capture-button:hover:not(:disabled) {
+  background: #8863aa;
+  transform: translateY(-1px);
+}
+
+.screen-capture-button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.screen-capture-permission {
+  flex-basis: 100%;
+  margin: -5px 0 0 57px;
+  font-size: 11px;
+  line-height: 1.4;
+  opacity: 0.65;
+}
+
+.screen-capture-error {
+  flex-basis: 100%;
+  margin: 0 0 0 57px;
+  color: #a33a50;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.screen-capture-hidden-video {
+  position: fixed;
+  left: -10000px;
+  top: 0;
+  width: 2px;
+  height: 2px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (max-width: 700px) {
+  .screen-capture-card {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 13px;
+    padding: 16px;
+  }
+
+  .screen-capture-button {
+    width: 100%;
+  }
+
+  .screen-capture-permission,
+  .screen-capture-error {
+    margin: 0;
+  }
+}

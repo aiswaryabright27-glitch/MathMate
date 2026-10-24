@@ -1,0 +1,395 @@
+
+:root {
+  font-family: Inter, "Segoe UI", Arial, sans-serif;
+  color: #393449;
+  background: #fffafc;
+  font-synthesis: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: linear-gradient(155deg, #fffafc 0%, #f8f2ff 55%, #effaff 100%);
+  font-size: 13px;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px;
+  background: rgba(255, 250, 252, 0.96);
+  border-bottom: 1px solid #eee4f1;
+}
+
+.brand {
+  color: #8057a8;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.subtitle,
+.muted {
+  color: #81788d;
+  font-size: 12px;
+}
+
+.subtitle {
+  margin-top: 3px;
+}
+
+.live-dot {
+  color: #4d947b;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+main {
+  display: grid;
+  gap: 12px;
+  padding: 12px;
+}
+
+.card {
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid #eee3f2;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 4px 16px rgba(96, 68, 122, 0.06);
+}
+
+h2 {
+  margin: 0 0 10px;
+  font-size: 14px;
+}
+
+p {
+  line-height: 1.65;
+}
+
+button {
+  border: 0;
+  border-radius: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.primary {
+  width: 100%;
+  color: #fff;
+  background: linear-gradient(110deg, #a17bc8, #e49dbb);
+}
+
+.secondary {
+  color: #74538e;
+  background: #f2eafb;
+}
+
+.controls {
+  display: flex;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+select,
+textarea {
+  width: 100%;
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid #e5d9ed;
+  border-radius: 10px;
+  outline: none;
+  color: #393449;
+  background: #fff;
+  font: inherit;
+}
+
+select:focus,
+textarea:focus {
+  border-color: #b49ad7;
+  box-shadow: 0 0 0 3px #b49ad72a;
+}
+
+.controls select {
+  flex: 1;
+}
+
+.controls .secondary {
+  flex-shrink: 0;
+}
+
+.status {
+  min-height: 16px;
+  margin-top: 8px;
+  color: #81788d;
+  font-size: 11px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.status button {
+  margin-top: 8px;
+}
+
+.problem,
+.solution {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  white-space: normal;
+  line-height: 1.75;
+  color: #393449;
+}
+
+.problem {
+  padding: 12px;
+  border: 1px solid #f3e4d1;
+  border-radius: 12px;
+  background: #fff8ef;
+}
+
+.solution {
+  margin: 12px 0;
+}
+
+.solution:empty {
+  display: none;
+}
+
+/* Readable headings for each solution step */
+.problem h1,
+.problem h2,
+.problem h3,
+.solution h1,
+.solution h2,
+.solution h3,
+.bubble h1,
+.bubble h2,
+.bubble h3 {
+  color: #8057a8;
+  line-height: 1.4;
+}
+
+.problem h1,
+.solution h1,
+.bubble h1 {
+  margin: 16px 0 9px;
+  font-size: 18px;
+}
+
+.problem h2,
+.solution h2,
+.bubble h2 {
+  margin: 15px 0 8px;
+  font-size: 16px;
+}
+
+.problem h3,
+.solution h3,
+.bubble h3 {
+  margin: 13px 0 7px;
+  font-size: 14px;
+}
+
+/* Paragraphs and lists */
+.problem p,
+.solution p,
+.bubble p {
+  margin: 9px 0;
+}
+
+.problem ul,
+.problem ol,
+.solution ul,
+.solution ol,
+.bubble ul,
+.bubble ol {
+  margin: 10px 0;
+  padding-left: 24px;
+}
+
+.problem li,
+.solution li,
+.bubble li {
+  margin: 8px 0;
+  padding-left: 2px;
+}
+
+.solution strong,
+.problem strong,
+.bubble strong {
+  color: #60417f;
+  font-weight: 750;
+}
+
+.solution em,
+.problem em,
+.bubble em {
+  color: #665a77;
+}
+
+.solution hr,
+.problem hr,
+.bubble hr {
+  margin: 14px 0;
+  border: 0;
+  border-top: 1px solid #e8ddef;
+}
+
+.solution blockquote,
+.problem blockquote,
+.bubble blockquote {
+  margin: 10px 0;
+  padding: 8px 12px;
+  border-left: 3px solid #c5a8df;
+  border-radius: 0 8px 8px 0;
+  background: #faf5ff;
+}
+
+/* Inline code */
+.solution code,
+.problem code,
+.bubble code {
+  padding: 2px 5px;
+  border: 1px solid #eee4f5;
+  border-radius: 5px;
+  background: #f5eefb;
+  color: #67468a;
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 0.92em;
+  overflow-wrap: anywhere;
+}
+
+.solution pre,
+.problem pre,
+.bubble pre {
+  padding: 12px;
+  overflow-x: auto;
+  border: 1px solid #eee4f5;
+  border-radius: 10px;
+  background: #f9f5fc;
+  white-space: pre-wrap;
+}
+
+.solution pre code,
+.problem pre code,
+.bubble pre code {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+}
+
+/* KaTeX: textbook-style fractions and equations */
+.katex {
+  color: #49335f;
+  font-size: 1.12em;
+}
+
+.katex-display {
+  max-width: 100%;
+  margin: 15px 0;
+  padding: 12px 8px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  border: 1px solid #eee4f5;
+  border-radius: 10px;
+  background: #faf5ff;
+  text-align: center;
+}
+
+.katex-display > .katex {
+  white-space: nowrap;
+}
+
+/* Doubt chat */
+.doubts-card {
+  min-height: 240px;
+}
+
+.chat-history {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 280px;
+  margin-bottom: 12px;
+  padding: 2px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #d9c5e9 transparent;
+}
+
+.bubble {
+  max-width: 100%;
+  padding: 11px 12px;
+  border-radius: 12px;
+  overflow-wrap: anywhere;
+  line-height: 1.7;
+  white-space: normal;
+}
+
+.bubble.tutor {
+  align-self: flex-start;
+  border-bottom-left-radius: 4px;
+  background: #f2eafb;
+}
+
+.bubble.user {
+  align-self: flex-end;
+  border-bottom-right-radius: 4px;
+  background: #e5f6f0;
+  white-space: pre-wrap;
+}
+
+#chatForm {
+  display: grid;
+  gap: 8px;
+}
+
+#chatInput {
+  min-height: 60px;
+  resize: vertical;
+}
+
+@media (max-width: 390px) {
+  .topbar {
+    padding: 12px;
+  }
+
+  main {
+    padding: 8px;
+  }
+
+  .card {
+    padding: 11px;
+  }
+
+  .problem,
+  .solution,
+  .bubble {
+    line-height: 1.65;
+  }
+
+  .katex {
+    font-size: 1.02em;
+  }
+}

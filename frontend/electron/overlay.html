@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta
+  http-equiv="Content-Security-Policy"
+  content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src http://127.0.0.1:8000; font-src 'self' data:; media-src 'self' blob:;"
+     />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MathMate Floating Tutor</title>
+
+    <link rel="stylesheet" href="./overlay.css" />
+    <link rel="stylesheet" href="../node_modules/katex/dist/katex.min.css" />
+
+    <script defer src="../node_modules/katex/dist/katex.min.js"></script>
+    <script defer src="./overlay.js"></script>
+    <script defer src="./voice.js"></script>
+  </head>
+
+  <body>
+    <header class="topbar">
+      <div>
+        <div class="brand">✿ MathMate</div>
+        <div class="subtitle">Your little study companion</div>
+      </div>
+      <span class="live-dot">● READY</span>
+    </header>
+
+    <main>
+      <section class="card">
+        <h2>📸 Capture your worksheet</h2>
+        <p class="muted">
+          Choose the PDF window or screen you want MathMate to read.
+        </p>
+
+        <div class="controls">
+          <select id="sourceSelect" aria-label="Choose screen or window">
+            <option value="">Loading screens and windows…</option>
+          </select>
+          <button id="refreshBtn" class="secondary" type="button">
+            Refresh
+          </button>
+        </div>
+
+        <button id="captureBtn" class="primary" type="button">
+          Capture &amp; explain
+        </button>
+        <div id="captureStatus" class="status" role="status"></div>
+      </section>
+
+      <section class="card">
+        <h2>🧠 Problem &amp; solution</h2>
+        <div id="problem" class="problem">
+          Capture a worksheet to begin.
+        </div>
+        <div id="solution" class="solution"></div>
+
+        <button id="savePdfBtn" class="secondary" type="button" disabled>
+          Save solution into a PDF copy
+        </button>
+        <div id="pdfStatus" class="status" role="status"></div>
+      </section>
+
+      <section class="card doubts-card">
+        <h2>💬 Ask a doubt</h2>
+
+        <div id="chatHistory" class="chat-history" aria-live="polite">
+          <div class="bubble tutor">
+            Capture a question first, then ask me about any step.
+          </div>
+        </div>
+
+        <form id="chatForm">
+          <textarea
+            id="chatInput"
+            rows="2"
+            placeholder="e.g. Why did we use this formula?"
+            aria-label="Your question"
+          ></textarea>
+          <button id="sendBtn" class="primary" type="submit">
+            Ask MathMate
+          </button>
+        </form>
+
+        <div id="chatStatus" class="status" role="status"></div>
+      </section>
+    </main>
+  </body>
+</html>
