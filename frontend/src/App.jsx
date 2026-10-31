@@ -6,6 +6,7 @@ import "katex/dist/katex.min.css";
 import "./App.css";
 import ScreenCapture from "./components/ScreenCapture";
 import PDFWriteMode from "./components/PDFWriteMode";
+import NotebookWriter from "./components/NotebookWriter";
 
 const initialMessages = [
   {
@@ -43,6 +44,43 @@ function App() {
   const [tutorSolution, setTutorSolution] = useState(null);
   const [imageError, setImageError] = useState("");
   const [currentContext, setCurrentContext] = useState("");
+  const [notebookTab, setNotebookTab] = useState("writer"); // "writer" | "pdf" | "screen"
+
+  function handleNotebookSolution(solutionData) {
+    setTutorSolution(solutionData);
+    const problem = solutionData.recognized_problem || "Notebook Equation";
+    const steps = Array.isArray(solutionData.handwritten_steps)
+      ? solutionData.handwritten_steps
+      : [];
+    const answer = solutionData.final_answer || (steps.length ? steps[steps.length - 1] : "");
+
+    const formattedSteps = steps
+      .map((s, i) => `${i + 1}. **${s}**`)
+      .join("\n");
+
+    const messageContent = [
+      `### 📓 MathMate Written Solution ♡`,
+      `I solved **${problem}** and wrote each step directly onto your notebook:`,
+      "",
+      formattedSteps,
+      "",
+      answer ? `**Final Answer:** \`${answer}\` ✨` : "",
+      "",
+      solutionData.sidebar_explanation || "",
+    ]
+      .filter(Boolean)
+      .join("\n");
+
+    setCurrentContext(`Current problem on notebook: ${problem}\nAnswer: ${answer}`);
+
+    setMessages((prev) => [
+      ...prev,
+      {
+        role: "assistant",
+        text: messageContent,
+      },
+    ]);
+  }
 
   useEffect(() => {
     localStorage.setItem("mathmate-theme", darkMode ? "dark" : "light");
@@ -459,18 +497,151 @@ function App() {
 
           {activePage === "notebook" && (
             <>
+              {/* Notebook Mode Selector Tabs */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  marginBottom: "20px",
+                  flexWrap: "wrap",
+                }}
+                role="tablist"
+                aria-label="Notebook Mode Selection"
+              >
+                <button
+                  type="button"
+                  onClick={() => setNotebookTab("writer")}
+                  style={{
+                    padding: "9px 18px",
+                    borderRadius: "14px",
+                    border:
+                      notebookTab === "writer"
+                        ? "1.5px solid #bd79be"
+                        : "1px solid " + (darkMode ? "#4c3755" : "#e8d8e8"),
+                    background:
+                      notebookTab === "writer"
+                        ? "linear-gradient(135deg, #b77ecb, #d988b4)"
+                        : darkMode
+                        ? "#2d2235"
+                        : "#ffffff",
+                    color:
+                      notebookTab === "writer"
+                        ? "#ffffff"
+                        : darkMode
+                        ? "#e9d8ef"
+                        : "#5d4464",
+                    fontWeight: notebookTab === "writer" ? "750" : "600",
+                    fontSize: "13.5px",
+                    cursor: "pointer",
+                    boxShadow:
+                      notebookTab === "writer"
+                        ? "0 4px 14px rgba(183, 126, 203, 0.35)"
+                        : "none",
+                    transition: "all 0.18s ease",
+                  }}
+                  role="tab"
+                  aria-selected={notebookTab === "writer"}
+                >
+                  📓 Notebook Writer
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setNotebookTab("pdf")}
+                  style={{
+                    padding: "9px 18px",
+                    borderRadius: "14px",
+                    border:
+                      notebookTab === "pdf"
+                        ? "1.5px solid #bd79be"
+                        : "1px solid " + (darkMode ? "#4c3755" : "#e8d8e8"),
+                    background:
+                      notebookTab === "pdf"
+                        ? "linear-gradient(135deg, #b77ecb, #d988b4)"
+                        : darkMode
+                        ? "#2d2235"
+                        : "#ffffff",
+                    color:
+                      notebookTab === "pdf"
+                        ? "#ffffff"
+                        : darkMode
+                        ? "#e9d8ef"
+                        : "#5d4464",
+                    fontWeight: notebookTab === "pdf" ? "750" : "600",
+                    fontSize: "13.5px",
+                    cursor: "pointer",
+                    boxShadow:
+                      notebookTab === "pdf"
+                        ? "0 4px 14px rgba(183, 126, 203, 0.35)"
+                        : "none",
+                    transition: "all 0.18s ease",
+                  }}
+                  role="tab"
+                  aria-selected={notebookTab === "pdf"}
+                >
+                  📄 PDF Annotator
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setNotebookTab("screen")}
+                  style={{
+                    padding: "9px 18px",
+                    borderRadius: "14px",
+                    border:
+                      notebookTab === "screen"
+                        ? "1.5px solid #bd79be"
+                        : "1px solid " + (darkMode ? "#4c3755" : "#e8d8e8"),
+                    background:
+                      notebookTab === "screen"
+                        ? "linear-gradient(135deg, #b77ecb, #d988b4)"
+                        : darkMode
+                        ? "#2d2235"
+                        : "#ffffff",
+                    color:
+                      notebookTab === "screen"
+                        ? "#ffffff"
+                        : darkMode
+                        ? "#e9d8ef"
+                        : "#5d4464",
+                    fontWeight: notebookTab === "screen" ? "750" : "600",
+                    fontSize: "13.5px",
+                    cursor: "pointer",
+                    boxShadow:
+                      notebookTab === "screen"
+                        ? "0 4px 14px rgba(183, 126, 203, 0.35)"
+                        : "none",
+                    transition: "all 0.18s ease",
+                  }}
+                  role="tab"
+                  aria-selected={notebookTab === "screen"}
+                >
+                  🖥️ Screen Capture
+                </button>
+              </div>
+
               {canvasSnapshot && (
                 <span className="canvas-export-status" aria-live="polite">
                   Worksheet captured. MathMate can now analyse it.
                 </span>
               )}
 
-              <ScreenCapture
-                onCapture={handleScreenCapture}
-                disabled={isLoading}
-              />
+              {notebookTab === "writer" && (
+                <NotebookWriter
+                  darkMode={darkMode}
+                  onSolutionGenerated={handleNotebookSolution}
+                />
+              )}
 
-              <PDFWriteMode />
+              {notebookTab === "pdf" && <PDFWriteMode />}
+
+              {notebookTab === "screen" && (
+                <ScreenCapture
+                  onCapture={handleScreenCapture}
+                  disabled={isLoading}
+                />
+              )}
 
               {imageError && (
                 <section

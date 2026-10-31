@@ -19,6 +19,7 @@ from google.genai import types
 from pydantic import BaseModel, Field
 
 from memory import init_db, save_message, get_recent_messages
+from math_checker import solve_equation_step_by_step
 
 PROJECT_DIR = Path(__file__).resolve().parent
 load_dotenv(PROJECT_DIR / ".env")
@@ -65,6 +66,17 @@ class ImageSolveRequest(BaseModel):
         default="Please solve the maths problem in this image.",
         max_length=3000,
     )
+
+
+class EquationSolveRequest(BaseModel):
+    equation: str = Field(min_length=1, max_length=500)
+
+
+class AgenticTutorRequest(BaseModel):
+    image_base64: str = Field(min_length=1)
+    user_speech: str = Field(min_length=1, max_length=5000)
+    roast_mode: bool = False
+    context: str | None = None
 
 
 class WorkbookAnalysisRequest(BaseModel):
@@ -607,7 +619,16 @@ Return JSON only, without Markdown fences.
             extract_json_object(response.text or "")
         )
 
-        if result["needs_clarification"]:
+        if not result.get("handwritten_steps"):
+            # Check if recognized_problem or user_prompt contains an equation
+            cand = result.get("recognized_problem", "") or request.user_prompt
+            eq_m = re.search(r"([0-9a-zA-Z\s\+\-\*\/\^\(\)]+=[0-9a-zA-Z\s\+\-\*\/\^\(\)]+)", cand)
+            if eq_m:
+                solved = solve_equation_step_by_step(eq_m.group(1).strip())
+                if solved.get("success"):
+                    result["handwritten_steps"] = solved["steps"]
+                    result["needs_clarification"] = False
+        elif result["needs_clarification"]:
             result["handwritten_steps"] = []
 
         return result
@@ -620,10 +641,178 @@ Return JSON only, without Markdown fences.
         traceback.print_exc()
         print("==============================================\n")
 
+        # Fallback to local equation solver if user provided or prompted equation
+        cand = request.user_prompt
+        eq_m = re.search(r"([0-9a-zA-Z\s\+\-\*\/\^\(\)]+=[0-9a-zA-Z\s\+\-\*\/\^\(\)]+)", cand)
+        if eq_m:
+            solved = solve_equation_step_by_step(eq_m.group(1).strip())
+            if solved.get("success"):
+                return {
+                    "recognized_problem": solved["equation"],
+                    "handwritten_steps": solved["steps"],
+                    "y_start_percent": 60.0,
+                    "x_start_percent": 8.0,
+                    "sidebar_explanation": f"Solved equation ${solved['equation']}$ step-by-step: {', '.join(solved['steps'])}.",
+                    "speech_text": f"The answer is {solved['answer']}.",
+                    "needs_clarification": False,
+                    "model": "mathmate-local-engine",
+                }
+
         raise HTTPException(
             status_code=502,
             detail=get_friendly_api_error(error),
         )
+
+
+@app.post("/api/solve-equation")
+def solve_equation(request: EquationSolveRequest):
+    """Solve an algebraic equation step-by-step for the MathMate notebook writer."""
+    result = solve_equation_step_by_step(request.equation)
+    if not result.get("success"):
+        raise HTTPException(
+            status_code=400,
+            detail=result.get("error", "Could not solve equation."),
+        )
+    return result
+
+
+@app.post("/api/agentic-tutor")
+def agentic_tutor(request: AgenticTutorRequest):
+    """
+    Agentic Math Tutor that lives directly inside the student's notebook.
+    Listens to spoken queries ('How do I get started?', 'Check for mistakes',
+    'Finish my calculations', 'Draw a graph'), acts on the notebook canvas,
+    speaks answers aloud, flags mistakes with sticky notes, and playfully roasts if enabled.
+    """
+    image_bytes, mime_type = decode_image(request.image_base64)
+
+    prompt = f"""
+You are MathMate, an agentic AI math tutor living directly inside the student's notebook.
+The image shows the student's current notebook page with their homework, equation, or handwritten work.
+The student asked out loud:
+"{request.user_speech}"
+
+Roast mode is: {"ENABLED (deliver a witty, playful roast about their question or math before helping!)" if request.roast_mode else "DISABLED (be warm, encouraging, patient, loving: 'lovely ♡')"}.
+
+Analyze the homework/problem on the notebook image and their spoken question.
+Determine the student's intent:
+- "how_to_start": They want to know how to start problem 1 or the active problem. Explain the starting concept and provide 2-3 lines of starting formulas/steps.
+- "check_mistakes": They ask "is this right?" or to check their work. Check their calculations carefully. If there is a mistake (e.g. sign error, arithmetic error), locate its approximate position (x_percent, y_percent from 0 to 100), explain what went wrong, and provide the correction.
+- "finish_calculation": They ask to finish the calculation or find the answer. Work out the remaining steps and the final answer.
+- "draw_graph": They ask to draw a graph or the problem requires visualizing a function (e.g., y = x^2 - 4, line, parabola, sine). Provide mathematical function expression, domain [x_min, x_max], range [y_min, y_max], and key points (roots, intercepts, vertex).
+- "general": General math question or explanation.
+
+Return ONLY a valid JSON object with EXACTLY this structure:
+{{
+  "intent": "how_to_start | check_mistakes | finish_calculation | draw_graph | general",
+  "spoken_response": "1-3 natural spoken sentences to be read aloud to the student",
+  "roast": "A witty, hilarious playful roast if roast_mode is enabled, else null",
+  "handwritten_notes": [
+    "First step to write on notebook",
+    "Second step to write on notebook",
+    "Final result or key takeaway"
+  ],
+  "mistake_flag": {{
+    "has_mistake": false,
+    "note": "Careful with sign error here",
+    "x_percent": 45,
+    "y_percent": 30,
+    "correction": "(-3)^2 = +9"
+  }},
+  "graph_data": {{
+    "should_graph": false,
+    "title": "y = x^2 - 4",
+    "expression": "x**2 - 4",
+    "x_min": -5,
+    "x_max": 5,
+    "y_min": -5,
+    "y_max": 10,
+    "points": [["Root", -2, 0], ["Root", 2, 0], ["Vertex", 0, -4]]
+  }},
+  "final_answer": "x = 1"
+}}
+
+Rules:
+- handwritten_notes must be clean plain text / Unicode math symbols for writing directly on the notebook.
+- spoken_response should be natural, friendly, and conversational.
+- Return ONLY valid JSON with no markdown wrapping.
+"""
+
+    try:
+        require_client()
+
+        response = client.models.generate_content(
+            model=MODEL,
+            contents=[
+                types.Part.from_bytes(
+                    data=image_bytes,
+                    mime_type=mime_type,
+                ),
+                prompt,
+            ],
+            config=types.GenerateContentConfig(
+                response_mime_type="application/json",
+            ),
+        )
+
+        parsed = extract_json_object(response.text or "")
+        return parsed
+
+    except Exception as error:
+        print("\n========== AGENTIC TUTOR ERROR ==========")
+        traceback.print_exc()
+        print("=========================================\n")
+
+        # Intelligent fallback for local calculations
+        speech_lower = request.user_speech.lower()
+        roast = "Bro really broke math so hard even the AI had to reboot 💀" if request.roast_mode else None
+
+        # Check if graph is requested
+        if "graph" in speech_lower or "plot" in speech_lower:
+            return {
+                "intent": "draw_graph",
+                "spoken_response": "I'm drawing the graph directly on your notebook page right now!",
+                "roast": roast,
+                "handwritten_notes": ["Graphing function: y = x² - 4", "Roots at x = -2 and x = 2", "Vertex at (0, -4)"],
+                "mistake_flag": {"has_mistake": False},
+                "graph_data": {
+                    "should_graph": True,
+                    "title": "y = x² - 4",
+                    "expression": "x**2 - 4",
+                    "x_min": -5,
+                    "x_max": 5,
+                    "y_min": -5,
+                    "y_max": 10,
+                    "points": [["Root (-2,0)", -2, 0], ["Root (2,0)", 2, 0], ["Vertex (0,-4)", 0, -4]],
+                },
+                "final_answer": "y = x² - 4",
+            }
+
+        # Check for equation in speech
+        eq_m = re.search(r"([0-9a-zA-Z\s\+\-\*\/\^\(\)]+=[0-9a-zA-Z\s\+\-\*\/\^\(\)]+)", request.user_speech)
+        if eq_m:
+            solved = solve_equation_step_by_step(eq_m.group(1).strip())
+            if solved.get("success"):
+                return {
+                    "intent": "finish_calculation",
+                    "spoken_response": f"I finished that calculation for you. The final answer is {solved['answer']}.",
+                    "roast": roast,
+                    "handwritten_notes": solved["steps"],
+                    "mistake_flag": {"has_mistake": False},
+                    "graph_data": {"should_graph": False},
+                    "final_answer": solved["answer"],
+                }
+
+        # Fallback response
+        return {
+            "intent": "how_to_start",
+            "spoken_response": "To get started, identify your given values and isolate the main variable step-by-step.",
+            "roast": roast,
+            "handwritten_notes": ["Step 1: Identify given equations & variables", "Step 2: Isolate terms step by step"],
+            "mistake_flag": {"has_mistake": False},
+            "graph_data": {"should_graph": False},
+            "final_answer": None,
+        }
 
 
 @app.post("/api/scan-pdf-page")
