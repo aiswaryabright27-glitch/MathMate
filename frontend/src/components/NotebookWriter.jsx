@@ -51,7 +51,7 @@ export default function NotebookWriter({
   const [isWritingAnimation, setIsWritingAnimation] = useState(false);
   const [currentResponse, setCurrentResponse] = useState(null);
   const [statusMessage, setStatusMessage] = useState(
-    "Drop in your homework or write on the page, then ask MathMate out loud."
+    "Ready"
   );
 
   // History for Undo / Redo
@@ -705,7 +705,7 @@ export default function NotebookWriter({
         if (isFinal) {
           context.font = "bold 26px 'Caveat', 'Segoe Print', cursive, sans-serif";
           context.fillStyle = darkMode ? "#fae2ff" : "#451a66";
-          context.fillText(`${step}  ✓ ♡`, startX, currentY);
+          context.fillText(`${step}  ✓`, startX, currentY);
         } else {
           context.fillText(step, startX, currentY);
         }
@@ -755,7 +755,7 @@ export default function NotebookWriter({
         context.strokeRect(boxX, boxY, boxW, boxH);
 
         context.fillStyle = darkMode ? "#fae2ff" : "#451a66";
-        context.fillText(`${step}  ✓ ♡`, startX, currentY);
+        context.fillText(`${step}  ✓`, startX, currentY);
       } else {
         context.font = "bold 24px 'Caveat', 'Segoe Print', cursive, sans-serif";
         context.fillStyle = ink;
@@ -895,7 +895,7 @@ export default function NotebookWriter({
     context.setTransform(ratio, 0, 0, ratio, 0, 0);
     drawPaperPattern(context, rect.width, rect.height, paperStyle, darkMode);
     saveState();
-    setStatusMessage("Notebook cleared. Drop in your homework or write a problem! ♡");
+    setStatusMessage("Notebook cleared.");
   };
 
   const exportAsPng = () => {
@@ -914,7 +914,7 @@ export default function NotebookWriter({
       <div className="nw-header">
         <div>
           <span className="nw-eyebrow">✧ AGENTIC AI MATH TUTOR INSIDE YOUR NOTEBOOK ✧</span>
-          <h2 className="nw-title">MathMate Agentic Notebook ♡</h2>
+          <h2 className="nw-title">Notebook</h2>
           <p className="nw-subtitle">
             Drop in your homework or write your problem. MathMate listens in the background, finishes calculations,
             flags mistakes, draws graphs, and directly writes on the notebook!
@@ -1153,7 +1153,7 @@ export default function NotebookWriter({
             <span>
               {isTutorThinking
                 ? "MathMate is reasoning over your homework…"
-                : "MathMate is writing on your notebook… ♡"}
+                : "MathMate is writing on your notebook…"}
             </span>
           </div>
         )}

@@ -5,7 +5,7 @@ import "./ScreenCapture.css";
  * Lets the user explicitly choose a screen, desktop window, or browser tab,
  * captures one still frame, then stops sharing immediately.
  */
-export default function ScreenCapture({ onCapture, disabled = false }) {
+export default function ScreenCapture({ onCapture, disabled = false, compact = false }) {
   const [capturing, setCapturing] = useState(false);
   const [error, setError] = useState("");
   const videoRef = useRef(null);
@@ -81,15 +81,15 @@ export default function ScreenCapture({ onCapture, disabled = false }) {
   }
 
   return (
-    <section className="screen-capture-card" aria-label="Capture your current worksheet">
+    <section className={`screen-capture-card${compact ? " is-compact" : ""}`} aria-label="Capture your current worksheet">
       <video ref={videoRef} className="screen-capture-hidden-video" muted playsInline />
-      <div className="screen-capture-copy">
+      {!compact && <div className="screen-capture-copy">
         <span className="screen-capture-icon" aria-hidden="true">▣</span>
         <div>
           <h3>Working in another app?</h3>
           <p>Capture your PDF in Acrobat or anything visible on your screen, then ask MathMate about it.</p>
         </div>
-      </div>
+      </div>}
       <button
         type="button"
         className="screen-capture-button"
@@ -97,9 +97,9 @@ export default function ScreenCapture({ onCapture, disabled = false }) {
         disabled={disabled || capturing}
       >
         <span aria-hidden="true">{capturing ? "◌" : "⌗"}</span>
-        {capturing ? "Capturing…" : "Capture screen"}
+        {capturing ? "Capturing…" : compact ? "Capture notes" : "Capture screen"}
       </button>
-      <p className="screen-capture-permission">Your browser will ask you to choose a screen or window. Sharing stops after one screenshot.</p>
+      {!compact && <p className="screen-capture-permission">Your browser will ask you to choose a screen or window. Sharing stops after one screenshot.</p>}
       {error && <p className="screen-capture-error" role="alert">{error}</p>}
     </section>
   );

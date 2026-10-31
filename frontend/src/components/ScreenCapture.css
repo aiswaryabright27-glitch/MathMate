@@ -111,6 +111,38 @@
   pointer-events: none;
 }
 
+.screen-capture-card.is-compact {
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.screen-capture-card.is-compact .screen-capture-button {
+  width: 100%;
+  min-height: 38px;
+  border-radius: 10px;
+  background: #f1eff8;
+  color: #4f4578;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.screen-capture-card.is-compact .screen-capture-button:hover:not(:disabled) {
+  background: #e8e4f4;
+  transform: none;
+}
+
+.dark-mode .screen-capture-card.is-compact .screen-capture-button {
+  background: #393644;
+  color: #e8e3ff;
+}
+
+.screen-capture-card.is-compact .screen-capture-error { margin: 8px 0 0; }
+
 @media (max-width: 700px) {
   .screen-capture-card {
     align-items: stretch;
